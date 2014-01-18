@@ -43,6 +43,7 @@ load("output/site1/E_q3_cell_probs.Rdata")
 load("output/site1/E_q4_cell_probs.Rdata")
 load("output/site1/E_q5_cell_probs.Rdata")
 load("output/site1/E_q6_cell_probs.Rdata")
+load("output/site1/E_q7_cell_probs.Rdata")
 
 load("output/site1/CUFA_150_q1_cell_probs.Rdata")
 load("output/site1/CUFA_150_q2_cell_probs.Rdata")
@@ -50,6 +51,7 @@ load("output/site1/CUFA_150_q3_cell_probs.Rdata")
 load("output/site1/CUFA_150_q4_cell_probs.Rdata")
 load("output/site1/CUFA_150_q5_cell_probs.Rdata")
 load("output/site1/CUFA_150_q6_cell_probs.Rdata")
+load("output/site1/CUFA_150_q7_cell_probs.Rdata")
 
 load("output/site1/CUFA_nomin_q1_cell_probs.Rdata")
 load("output/site1/CUFA_nomin_q2_cell_probs.Rdata")
@@ -57,6 +59,7 @@ load("output/site1/CUFA_nomin_q3_cell_probs.Rdata")
 load("output/site1/CUFA_nomin_q4_cell_probs.Rdata")
 load("output/site1/CUFA_nomin_q5_cell_probs.Rdata")
 load("output/site1/CUFA_nomin_q6_cell_probs.Rdata")
+load("output/site1/CUFA_nomin_q7_cell_probs.Rdata")
 
 load("output/site1/E_evidence1.Rdata")
 load("output/site1/E_evidence2.Rdata")
@@ -64,6 +67,7 @@ load("output/site1/E_evidence3.Rdata")
 load("output/site1/E_evidence4.Rdata")
 load("output/site1/E_evidence5.Rdata")
 load("output/site1/E_evidence6.Rdata")
+load("output/site1/E_evidence7.Rdata")
 
 load("output/site1/CUFA_150_evidence1.Rdata")
 load("output/site1/CUFA_150_evidence2.Rdata")
@@ -71,6 +75,7 @@ load("output/site1/CUFA_150_evidence3.Rdata")
 load("output/site1/CUFA_150_evidence4.Rdata")
 load("output/site1/CUFA_150_evidence5.Rdata")
 load("output/site1/CUFA_150_evidence6.Rdata")
+load("output/site1/CUFA_150_evidence7.Rdata")
 
 load("output/site1/CUFA_nomin_evidence1.Rdata")
 load("output/site1/CUFA_nomin_evidence2.Rdata")
@@ -78,10 +83,11 @@ load("output/site1/CUFA_nomin_evidence3.Rdata")
 load("output/site1/CUFA_nomin_evidence4.Rdata")
 load("output/site1/CUFA_nomin_evidence5.Rdata")
 load("output/site1/CUFA_nomin_evidence6.Rdata")
+load("output/site1/CUFA_nomin_evidence7.Rdata")
 
 #### Calculate the number of events (length) of each cell ####
 # Existing conditions
-E_all_probs <- c(E_q1_cell_probs, E_q2_cell_probs, E_q3_cell_probs, E_q4_cell_probs, E_q5_cell_probs, E_q6_cell_probs) # Combine probabilities for all cells
+E_all_probs <- c(E_q1_cell_probs, E_q2_cell_probs, E_q3_cell_probs, E_q4_cell_probs, E_q5_cell_probs, E_q6_cell_probs, E_q7_cell_probs) # Combine probabilities for all cells
 head(E_all_probs) # Examine cell probs
 E_lengths <- as.data.frame(sapply(E_all_probs, length)) # Calculate the number of events in each cell and convert to data frame
 E_lengths <- data.frame(c(as.numeric(row.names(E_lengths))), E_lengths[,1]) # Create new data frame with cell number in first column and number of events in second colume
@@ -92,7 +98,7 @@ E_mean <- mean(E_lengths[,2]) # Calculate the mean number of events for all cell
 E_mean # View mean
 
 # CUFA 150
-CUFA_150_all_probs <- c(CUFA_150_q1_cell_probs, CUFA_150_q2_cell_probs, CUFA_150_q3_cell_probs, CUFA_150_q4_cell_probs, CUFA_150_q5_cell_probs, CUFA_150_q6_cell_probs) # Combine probabilities for all cells
+CUFA_150_all_probs <- c(CUFA_150_q1_cell_probs, CUFA_150_q2_cell_probs, CUFA_150_q3_cell_probs, CUFA_150_q4_cell_probs, CUFA_150_q5_cell_probs, CUFA_150_q6_cell_probs, CUFA_150_q7_cell_probs) # Combine probabilities for all cells
 head(CUFA_150_all_probs) # Examine cell probs
 CUFA_150_lengths <- as.data.frame(sapply(CUFA_150_all_probs, length)) # Calculate the number of events in each cell and convert to data frame
 CUFA_150_lengths <- data.frame(c(as.numeric(row.names(CUFA_150_lengths))), CUFA_150_lengths[,1]) # Create new data frame with cell number in first column and number of events in second colume
@@ -103,7 +109,7 @@ CUFA_150_mean <- mean(CUFA_150_lengths[,2]) # Calculate the mean number of event
 CUFA_150_mean # View mean
 
 # CUFA no minimum
-CUFA_nomin_all_probs <- c(CUFA_nomin_q1_cell_probs, CUFA_nomin_q2_cell_probs, CUFA_nomin_q3_cell_probs, CUFA_nomin_q4_cell_probs, CUFA_nomin_q5_cell_probs, CUFA_nomin_q6_cell_probs) # Combine probabilities for all cells
+CUFA_nomin_all_probs <- c(CUFA_nomin_q1_cell_probs, CUFA_nomin_q2_cell_probs, CUFA_nomin_q3_cell_probs, CUFA_nomin_q4_cell_probs, CUFA_nomin_q5_cell_probs, CUFA_nomin_q6_cell_probs, CUFA_nomin_q7_cell_probs) # Combine probabilities for all cells
 head(CUFA_nomin_all_probs) # Examine cell probs
 CUFA_nomin_lengths <- as.data.frame(sapply(CUFA_nomin_all_probs, length)) # Calculate the number of events in each cell and convert to data frame
 CUFA_nomin_lengths <- data.frame(c(as.numeric(row.names(CUFA_nomin_lengths))), CUFA_nomin_lengths[,1]) # Create new data frame with cell number in first column and number of events in second colume
@@ -115,8 +121,8 @@ CUFA_nomin_mean # View mean
 
 #### Calculate the difference in events between existing conditions and the scenario for each cell ####
 
-E_lengths_1 <- E_lengths[E_lengths[,1]%in%CUFA_150_lengths[,1],] # Match cells in existing conditions and CUFA 150
-E_lengths_2 <- E_lengths[E_lengths[,1]%in%CUFA_nomin_lengths[,1],] # Match cells in existing conditions and CUFA no mininum
+E_lengths_1 <- E_lengths[E_lengths[ ,1] %in% CUFA_150_lengths[ ,1], ] # Match cells in existing conditions and CUFA 150
+E_lengths_2 <- E_lengths[E_lengths[ ,1] %in% CUFA_nomin_lengths[ ,1], ] # Match cells in existing conditions and CUFA no mininum
 
 # CUFA 150
 CUFA_150_pct_diff <- as.data.frame((E_lengths_1[,2]-CUFA_150_lengths[,2])/E_lengths_1[,2]*100)
@@ -175,7 +181,7 @@ CUFA_nomin_prob_diffs <- data.frame(cell = E_output[ ,1], mean_prob_diff = CUFA_
 hist(CUFA_nomin_prob_diffs[ ,2])
 
 # Read x,y coordinate for the site
-site1_xy <- read.table("data/coordinates/site1_cords.txt", header=TRUE)
+site1_xy <- read.table("data/coordinates/site1_coords_1000_to_4000.txt", header=TRUE)
 
 # Trim x,y coordinate data so only cells with model outputs are included
 site1_xy_trim <- site1_xy[site1_xy[ ,3] %in% E_output[ ,1],]
