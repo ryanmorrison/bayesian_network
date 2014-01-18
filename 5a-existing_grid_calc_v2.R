@@ -3,21 +3,7 @@
 set.seed(140)
 
 # Change input table depending on the site number
-
-# Site 1
 E_alldata <- read.table("data/site1_1000_to_4000.txt", header=FALSE, skip=0)
-
-# Site 2
-# E_alldata <- read.table("data/s2_1000_to_2000.txt", header=FALSE, skip=0)
-
-# Site 3
-# E_alldata <- read.table("data/s3_1000_to_2000.txt", header=FALSE, skip=0)
-
-# Site 4
-# E_alldata <- read.table("data/s4_1000_to_2000.txt", header=FALSE, skip=0)
-
-# Site 5
-# E_alldata <- read.table("data/s5_1000_to_2000.txt", header=FALSE, skip=0)
 
 colnames(E_alldata) <- c("cell", "flood_cfs")
 
