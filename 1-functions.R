@@ -234,6 +234,136 @@ cpt.roundoff <- function(cpt_table) {
   return (cpt_table)
 }
 
+# This function loads all the cell probabilities for a specified site number
+load.probs <- function(sitenumber) { # Enter site number as character, e.g. "site4"
+  exten <- paste("output/", sitenumber, "/", sep = "" ) # Create a path extension based on the given site number
+  filenames1 <- list.files(path=exten, pattern="^E_q") # Find all the files with pattern "E_q..."
+  filenames1 <- as.list(paste(exten, filenames1, sep = "")) # Paste the path in front of the file names
+  lapply(filenames1[2:8], load, .GlobalEnv) # Load all the files except the .csv file
+  filenames2 <- list.files(path=exten, pattern="^CUFA_150_q") # Find all the files with pattern "CUFA_150_q..."
+  filenames2 <- as.list(paste(exten, filenames2, sep = "")) # Paste the path in front of the file names
+  lapply(filenames2[2:8], load, .GlobalEnv) # Load all the files except the .csv file
+  filenames3 <- list.files(path=exten, pattern="^CUFA_nomin_q") # Find all the files with pattern "CUFA_nomin_q..."
+  filenames3 <- as.list(paste(exten, filenames3, sep = "")) # Paste the path in front of the file names
+  lapply(filenames3[2:8], load, .GlobalEnv) # Load all the files except the .csv file
+#   return(list(filenames1[2:8], filenames2[2:8], filenames3[2:8]))
+}
+
+# These functions combine all the probability ouputs and groups them according to Q_bins
+combine.probs.E <- function() {
+  a1 <- unlist(lapply(E_q1_cell_probs, mean, na.rm=TRUE))
+  b1 <- data.frame(prob=a1, Q_bin = 1)
+  a2 <- unlist(lapply(E_q2_cell_probs, mean, na.rm=TRUE))
+  b2 <- data.frame(prob=a2, Q_bin = 2)
+  a3 <- unlist(lapply(E_q3_cell_probs, mean, na.rm=TRUE))
+  b3 <- data.frame(prob=a3, Q_bin = 3)
+  a4 <- unlist(lapply(E_q4_cell_probs, mean, na.rm=TRUE))
+  b4 <- data.frame(prob=a4, Q_bin = 4)
+  a5 <- unlist(lapply(E_q5_cell_probs, mean, na.rm=TRUE))
+  b5 <- data.frame(prob=a5, Q_bin = 5)
+  a6 <- unlist(lapply(E_q6_cell_probs, mean, na.rm=TRUE))
+  b6 <- data.frame(prob=a6, Q_bin = 6)
+  a7 <- unlist(lapply(E_q7_cell_probs, mean, na.rm=TRUE))
+  b7 <- data.frame(prob=a7, Q_bin = 7)
+  all <- rbind(b1, b2, b3, b4, b5, b6, b7)
+  return(all)
+}
+
+combine.probs.CUFA.150 <- function() {
+  a1 <- unlist(lapply(CUFA_150_q1_cell_probs, mean, na.rm=TRUE))
+  b1 <- data.frame(prob=a1, Q_bin = 1)
+  a2 <- unlist(lapply(CUFA_150_q2_cell_probs, mean, na.rm=TRUE))
+  b2 <- data.frame(prob=a2, Q_bin = 2)
+  a3 <- unlist(lapply(CUFA_150_q3_cell_probs, mean, na.rm=TRUE))
+  b3 <- data.frame(prob=a3, Q_bin = 3)
+  a4 <- unlist(lapply(CUFA_150_q4_cell_probs, mean, na.rm=TRUE))
+  b4 <- data.frame(prob=a4, Q_bin = 4)
+  a5 <- unlist(lapply(CUFA_150_q5_cell_probs, mean, na.rm=TRUE))
+  b5 <- data.frame(prob=a5, Q_bin = 5)
+  a6 <- unlist(lapply(CUFA_150_q6_cell_probs, mean, na.rm=TRUE))
+  b6 <- data.frame(prob=a6, Q_bin = 6)
+  a7 <- unlist(lapply(CUFA_150_q7_cell_probs, mean, na.rm=TRUE))
+  b7 <- data.frame(prob=a7, Q_bin = 7)
+  all <- rbind(b1, b2, b3, b4, b5, b6, b7)
+  return(all)
+}
+
+combine.probs.CUFA.nomin <- function() {
+  a1 <- unlist(lapply(CUFA_nomin_q1_cell_probs, mean, na.rm=TRUE))
+  b1 <- data.frame(prob=a1, Q_bin = 1)
+  a2 <- unlist(lapply(CUFA_nomin_q2_cell_probs, mean, na.rm=TRUE))
+  b2 <- data.frame(prob=a2, Q_bin = 2)
+  a3 <- unlist(lapply(CUFA_nomin_q3_cell_probs, mean, na.rm=TRUE))
+  b3 <- data.frame(prob=a3, Q_bin = 3)
+  a4 <- unlist(lapply(CUFA_nomin_q4_cell_probs, mean, na.rm=TRUE))
+  b4 <- data.frame(prob=a4, Q_bin = 4)
+  a5 <- unlist(lapply(CUFA_nomin_q5_cell_probs, mean, na.rm=TRUE))
+  b5 <- data.frame(prob=a5, Q_bin = 5)
+  a6 <- unlist(lapply(CUFA_nomin_q6_cell_probs, mean, na.rm=TRUE))
+  b6 <- data.frame(prob=a6, Q_bin = 6)
+  a7 <- unlist(lapply(CUFA_nomin_q7_cell_probs, mean, na.rm=TRUE))
+  b7 <- data.frame(prob=a7, Q_bin = 7)
+  all <- rbind(b1, b2, b3, b4, b5, b6, b7)
+  return(all)
+}
+
+# These functions combine all the evidence ouputs and groups them according to Q_bins
+combine.lengths.E <- function() {
+  a1 <- sapply(E_q1_cell_probs, length)
+  b1 <- data.frame(evidence=a1, Q_bin = 1)
+  a2 <- sapply(E_q2_cell_probs, length)
+  b2 <- data.frame(evidence=a2, Q_bin = 2)
+  a3 <- sapply(E_q3_cell_probs, length)
+  b3 <- data.frame(evidence=a3, Q_bin = 3)
+  a4 <- sapply(E_q4_cell_probs, length)
+  b4 <- data.frame(evidence=a4, Q_bin = 4)
+  a5 <- sapply(E_q5_cell_probs, length)
+  b5 <- data.frame(evidence=a5, Q_bin = 5)
+  a6 <- sapply(E_q6_cell_probs, length)
+  b6 <- data.frame(evidence=a6, Q_bin = 6)
+  a7 <- sapply(E_q7_cell_probs, length)
+  b7 <- data.frame(evidence=a7, Q_bin = 7)
+  all <- rbind(b1, b2, b3, b4, b5, b6, b7)
+  return(all)
+}
+
+combine.lengths.CUFA.150 <- function() {
+  a1 <- sapply(CUFA_150_q1_cell_probs, length)
+  b1 <- data.frame(evidence=a1, Q_bin = 1)
+  a2 <- sapply(CUFA_150_q2_cell_probs, length)
+  b2 <- data.frame(evidence=a2, Q_bin = 2)
+  a3 <- sapply(CUFA_150_q3_cell_probs, length)
+  b3 <- data.frame(evidence=a3, Q_bin = 3)
+  a4 <- sapply(CUFA_150_q4_cell_probs, length)
+  b4 <- data.frame(evidence=a4, Q_bin = 4)
+  a5 <- sapply(CUFA_150_q5_cell_probs, length)
+  b5 <- data.frame(evidence=a5, Q_bin = 5)
+  a6 <- sapply(CUFA_150_q6_cell_probs, length)
+  b6 <- data.frame(evidence=a6, Q_bin = 6)
+  a7 <- sapply(CUFA_150_q7_cell_probs, length)
+  b7 <- data.frame(evidence=a7, Q_bin = 7)
+  all <- rbind(b1, b2, b3, b4, b5, b6, b7)
+  return(all)
+}
+
+combine.lengths.CUFA.nomin <- function() {
+  a1 <- sapply(CUFA_nomin_q1_cell_probs, length)
+  b1 <- data.frame(evidence=a1, Q_bin = 1)
+  a2 <- sapply(CUFA_nomin_q2_cell_probs, length)
+  b2 <- data.frame(evidence=a2, Q_bin = 2)
+  a3 <- sapply(CUFA_nomin_q3_cell_probs, length)
+  b3 <- data.frame(evidence=a3, Q_bin = 3)
+  a4 <- sapply(CUFA_nomin_q4_cell_probs, length)
+  b4 <- data.frame(evidence=a4, Q_bin = 4)
+  a5 <- sapply(CUFA_nomin_q5_cell_probs, length)
+  b5 <- data.frame(evidence=a5, Q_bin = 5)
+  a6 <- sapply(CUFA_nomin_q6_cell_probs, length)
+  b6 <- data.frame(evidence=a6, Q_bin = 6)
+  a7 <- sapply(CUFA_nomin_q7_cell_probs, length)
+  b7 <- data.frame(evidence=a7, Q_bin = 7)
+  all <- rbind(b1, b2, b3, b4, b5, b6, b7)
+  return(all)
+}
 
 # test.function.p3 <- function(network, evidence_table) {
 #   b <- nrow(evidence_table)
