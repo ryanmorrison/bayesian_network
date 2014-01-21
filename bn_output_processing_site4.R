@@ -210,6 +210,48 @@ writeOGR(CUFA_150_gis, "/Users/Morrison/Documents/GIS/Projects/gila bn/shapefile
 
 
 
+
+#### Combine all scenarios into single data frame for analysis ####
+# Combine model ouput
+E_site4 <- data.frame(combine.probs.E(), scenario = "existing")
+CUFA_150_site4 <- data.frame(combine.probs.CUFA.150(), scenario = "CUFA_150")
+CUFA_nomin_site4 <- data.frame(combine.probs.CUFA.nomin(), scenario = "CUFA_nomin")
+combined_site4 <- data.frame(rbind(E_site4, CUFA_150_site4, CUFA_nomin_site4), site = "site4")
+
+# Calculate and combine evidence in each cell
+E_lengths_site4 <- combine.lengths.E()
+CUFA_150_lengths_site4 <- combine.lengths.CUFA.150()
+CUFA_nomin_lengths_site4 <- combine.lengths.CUFA.nomin()
+
+# Calculate difference in events
+E_lengthsdiff_site4 <- (E_lengths_site4[ ,1] - E_lengths_site4[ ,1])/E_lengths_site4[ ,1] * 100
+CUFA_150_lengthsdiff_site4 <- (E_lengths_site4[ ,1] - CUFA_150_lengths_site4[ ,1])/E_lengths_site4[ ,1] * 100
+CUFA_nomin_lengthsdiff_site4 <- (E_lengths_site4[ ,1] - CUFA_nomin_lengths_site4[ ,1])/E_lengths_site4[ ,1] * 100
+
+# Apply utility function to calculate percent decrease in probabilities
+E_utility_site4 <- utility_ftn(E_lengthsdiff_site4)
+CUFA_150_utility_site4 <- utility_ftn(CUFA_150_lengthsdiff_site4)
+CUFA_nomin_utility_site4 <- utility_ftn(CUFA_nomin_lengthsdiff_site4)
+
+# Apply utility function decreases to probabilities
+E_util_site4 <- E_site4[ ,1] * E_utility_site4
+CUFA_150_util_site4 <- CUFA_150_site4[ ,1] * CUFA_150_utility_site4
+CUFA_nomin_util_site4 <- CUFA_nomin_site4[ ,1] * CUFA_nomin_utility_site4
+
+# Make one large data frame with all the data
+E_site4 <- data.frame(prob = E_site4$prob, util_prob = E_util_site4, evidence = E_lengths_site4$evidence, Q_bin = E_site4$Q_bin, scenario = E_site4$scenario)
+CUFA_150_site4 <- data.frame(prob = CUFA_150_site4$prob, util_prob = CUFA_150_util_site4, evidence = CUFA_150_lengths_site4$evidence, Q_bin = CUFA_150_site4$Q_bin, scenario = CUFA_150_site4$scenario)
+CUFA_nomin_site4 <- data.frame(prob = CUFA_nomin_site4$prob, util_prob = CUFA_nomin_util_site4, evidence = CUFA_nomin_lengths_site4$evidence, Q_bin = CUFA_nomin_site4$Q_bin, scenario = CUFA_nomin_site4$scenario)
+combined_site4 <- data.frame(rbind(E_site4, CUFA_150_site4, CUFA_nomin_site4), site = "site4")
+
+# Export as .Rdata
+save(combined_site4, file="output/combined_site4.Rdata")
+
+
+
+
+
+
 # #### Approach #2 ####
 # 
 # #### Account for cells that are not inundated and have zero probability ####
