@@ -239,9 +239,24 @@ CUFA_150_util_site1 <- CUFA_150_site1[ ,1] * CUFA_150_utility_site1
 CUFA_nomin_util_site1 <- CUFA_nomin_site1[ ,1] * CUFA_nomin_utility_site1
 
 # Make one large data frame with all the data
-E_site1 <- data.frame(prob = E_site1$prob, util_prob = E_util_site1, evidence = E_lengths_site1$evidence, Q_bin = E_site1$Q_bin, scenario = E_site1$scenario)
-CUFA_150_site1 <- data.frame(prob = CUFA_150_site1$prob, util_prob = CUFA_150_util_site1, evidence = CUFA_150_lengths_site1$evidence, Q_bin = CUFA_150_site1$Q_bin, scenario = CUFA_150_site1$scenario)
-CUFA_nomin_site1 <- data.frame(prob = CUFA_nomin_site1$prob, util_prob = CUFA_nomin_util_site1, evidence = CUFA_nomin_lengths_site1$evidence, Q_bin = CUFA_nomin_site1$Q_bin, scenario = CUFA_nomin_site1$scenario)
+E_site1 <- data.frame(prob = E_site1$prob, 
+                      util_prob = E_util_site1, 
+                      prob_diff = E_util_site1 - E_site1$prob, 
+                      evidence = E_lengths_site1$evidence, 
+                      Q_bin = E_site1$Q_bin, 
+                      scenario = E_site1$scenario)
+CUFA_150_site1 <- data.frame(prob = CUFA_150_site1$prob, 
+                             util_prob = CUFA_150_util_site1, 
+                             prob_diff = CUFA_150_util_site1 - E_site1$prob, 
+                             evidence = CUFA_150_lengths_site1$evidence, 
+                             Q_bin = CUFA_150_site1$Q_bin, 
+                             scenario = CUFA_150_site1$scenario)
+CUFA_nomin_site1 <- data.frame(prob = CUFA_nomin_site1$prob, 
+                               util_prob = CUFA_nomin_util_site1,
+                               prob_diff = CUFA_nomin_util_site1 - E_site1$prob,
+                               evidence = CUFA_nomin_lengths_site1$evidence,
+                               Q_bin = CUFA_nomin_site1$Q_bin, 
+                               scenario = CUFA_nomin_site1$scenario)
 combined_site1 <- data.frame(rbind(E_site1, CUFA_150_site1, CUFA_nomin_site1), site = "site1")
 
 # Export as .Rdata

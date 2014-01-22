@@ -3,6 +3,9 @@ library(reshape2)
 library(ggplot2)
 library(scales) # Library for modifying scales on plots
 library(grid) # Library for developing nonstandard plotting themes
+library(extrafont)      # Library for embedding system fonds in pdf plots
+loadfonts()             # Loads system fonts into R. If you want to output to .ps files instead of .pdf, use:
+                        # loadfonts(device="postscript")
 
 #### Set working directory ####
 setwd("/Users/Morrison/Dropbox/Gila Bayesian/bayesian_network")
@@ -62,7 +65,7 @@ theme_tufte <- function(ticks=TRUE, base_family="Lato", base_size=11) {
       strip.background  	= element_blank(),
       plot.background   	= element_blank(),
       axis.line         	= element_line(color="black", size=0.35),
-      
+
       panel.margin 	  	= unit(1.5, "lines"))
   if (!ticks) {
     ret <- ret + theme(axis.ticks = element_blank())
@@ -78,6 +81,14 @@ hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x
 hydroplot <- hydroplot + theme_tufte()
 hydroplot
 
-hydroplot2 <- ggplot(data = combined_hydro_melt, aes(x = doy, y = value, group = variable, color = variable))
-hydroplot2 <- hydroplot2 + stat_summary(fun.y = "mean", geom = "line")
-hydroplot2
+hydroplot <- ggplot(data = combined_hydro_means, aes(x = doy, y = value, group = variable, linetype = variable))
+hydroplot <- hydroplot + geom_line()
+hydroplot <- hydroplot + scale_linetype_manual(name = "Scenario", values= c("Gila_Gila" = 1, "CUFA_150" = 2, "CUFA_nomin" = 3, "CUFA_150_diff" = 2, "CUFA_nomin_diff" = 3))
+hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x="Day of the Year", y="Mean Discharge (cfs)")
+hydroplot <- hydroplot + theme_tufte()
+hydroplot
+ggsave("figs/hydroplot.pdf", hydroplot, width=11, height=4)
+
+# hydroplot2 <- ggplot(data = combined_hydro_melt, aes(x = doy, y = value, group = variable, color = variable))
+# hydroplot2 <- hydroplot2 + stat_summary(fun.y = "mean", geom = "line")
+# hydroplot2

@@ -1,3 +1,5 @@
+dim_TIMING <- c("March-May", "May-July", "July-Sept")
+dim_FLOOD <- c("Yes", "No")
 dim_RECESSION <- c("<1cm/s", "1-3 cm/s", ">3 cm/s")
 dim_DURATION <- c("<24 hrs", ">24 hrs")
 dim_HYDRO_COND <- c("Low", "Medium", "High")
@@ -406,304 +408,185 @@ prob_cond
 post_ent <- -1*(prob_smoker[1] * sum(prob_cond_prod[1,]) + prob_smoker[2] * sum(prob_cond_prod[2,]))
 post_ent
 (prior_ent - post_ent)
-source("/Users/Morrison/Dropbox/Gila Bayesian/bayesian_network/R/functions.R")
-Hydrologic Data Processessing #####
-library(xts)#
-library(prob)#
-library(TTR)#
-library(bigmemory)#
-source("R/functions.R")#
+Load libraries #####
+library(reshape2)#
+library(ggplot2)#
+library(scales) # Library for modifying scales on plots#
+library(grid) # Library for developing nonstandard plotting themes#
+library(extrafont)      # Library for embedding system fonds in pdf plots#
+loadfonts()             # Loads system fonts into R. If you want to output to .ps files instead of .pdf, use:   #
+                        # loadfonts(device="postscript")#
 #
 #### Set working directory #####
 setwd("/Users/Morrison/Dropbox/Gila Bayesian/bayesian_network")#
 #
-#### WINDOWS WORKING DIRECTORY#####
-# setwd("/Users/rmorriso/Documents/bayesian_network")#
+#### Source common functions #####
+source('~/Dropbox/Gila Bayesian/bayesian_network/1-functions.R')#
 #
-#### Process USGS hydrology data #####
-# gila <- usgs.process("data/usgs_09430500_daily.txt")#
-# mogollon <- usgs.process("data/usgs_09430600_daily.txt")#
+#### Load hydrology data #####
 #
-# # Trim Gila gage data before 1967-02-21 (start date of Mogollon data)#
-# startindex <- grep("1967-02-21", gila$date)#
-# gila <- gila[startindex:nrow(gila),]#
-#
-# # Trim Mogollon gage data after 2013-09-24 (end date of Gila data)#
-# endindex <- grep("2013-09-24", mogollon$date)#
-# mogollon <- mogollon[1:endindex,]#
-#
-# # Double check that all the dates align#
-# doublecheck <- count(mogollon$date == gila$date)#
-#
-# # Add the Gila and Mogollon dataset to produce hydrology at the research sites#
-# hydro <- data.frame(date=gila$date)#
-# hydro$cfs <- gila$cfs + mogollon$cfs#
+# Add the Gila at Gila USGS gage data#
 hydro <- usgs.process("data/usgs_09430500_daily.txt")#
 #
-#### Add stage values (feet and cm) to data frame based on a regression equation #####
-# The regression equation was developed using historical gage data, and changes depending on the site location#
+# Read data for the scenarios#
+CUFA_150 <- scenario.process("data/scenarios.csv", 3)#
+CUFA_nomin <- scenario.process("data/scenarios.csv", 4)#
 #
-# SITE 1#
-head_conv <- function(Q) 0.0011*Q#
+#### Organize hydrology data #####
 #
-# SITE 2#
-# head_conv <- function(Q) 0.0011*Q#
+# The datasets have different lengths and need to match, so the hydro dataset is trimmed#
+hydro <- hydro[hydro[ ,1] %in% CUFA_150[ ,1], ]#
 #
-# SITE 3#
-# head_conv <- function(Q) 0.056*(Q^0.5612)#
+# Combine all datasets into one data frame#
+combined_hydro <- data.frame(date = hydro$date, Gila_Gila = hydro$cfs, CUFA_150 = CUFA_150$cfs, CUFA_nomin = CUFA_nomin$cfs)#
 #
-# SITE 4#
-# head_conv <- function(Q) 0.0014*(Q^0.99)#
+# Add day of year to the data frame so flows can be averaged across the time series#
+doy <- as.numeric(strftime(combined_hydro$date, format = "%j")) # Get day of the year value from dates#
+combined_hydro <- cbind(doy, combined_hydro[ ,2:4], doy)#
 #
-# SITE 5#
-# head_conv <- function(Q) 0.1123*(Q^0.4963)#
+# Arrange the data frame according to day of the year#
+combined_hydro_melt <- melt(combined_hydro, id.vars = "doy")#
+head(combined_hydro_melt)#
 #
-hydro_stage <- stage(hydro, head_conv)#
-hydro <- data.frame(hydro, hydro_stage)#
+# Calculate mean discharge for each day of the year#
+combined_hydro_means <- dcast(combined_hydro_melt, doy~variable, mean)#
+combined_hydro_means#
 #
-#### Calculate recession rates #####
-# The 1-, 2-, ... , 7-day, 14-day recession rates were computed#
-recess_1d <- recession.rate.forward(hydro, 1)#
-recess_2d <- recession.rate.forward(hydro, 2)#
-recess_3d <- recession.rate.forward(hydro, 3)#
-recess_4d <- recession.rate.forward(hydro, 4)#
-recess_5d <- recession.rate.forward(hydro, 5)#
-recess_6d <- recession.rate.forward(hydro, 6)#
-recess_7d <- recession.rate.forward(hydro, 7)#
-recess_14d <- recession.rate.forward(hydro, 14)#
-recess_30d <- recession.rate.forward(hydro, 30)#
-recess_45d <- recession.rate.forward(hydro, 45)#
+# Calculate difference in means between Gila-Gila and each scenario#
+combined_mean_diffs_150 <- combined_hydro_means$CUFA_150 - combined_hydro_means$Gila_Gila#
+combined_mean_diffs_nomin <- combined_hydro_means$CUFA_nomin - combined_hydro_means$Gila_Gila#
 #
-# hydro <- cbind(hydro, recess_1d)#
-# recess_2d <- as.data.frame(SMA(hydro[,5], 2))#
-# recess_3d <- as.data.frame(SMA(hydro[,5], 3))#
-# recess_4d <- as.data.frame(SMA(hydro[,5], 4))#
-# recess_5d <- as.data.frame(SMA(hydro[,5], 5))#
-# recess_6d <- as.data.frame(SMA(hydro[,5], 6))#
-# recess_7d <- as.data.frame(SMA(hydro[,5], 7))#
-# recess_14d <- as.data.frame(SMA(hydro[,5], 14))#
-# recess_45d <- as.data.frame(SMA(hydro[,5], 45))#
+combined_hydro_means <- data.frame(combined_hydro_means, CUFA_150_diff = combined_mean_diffs_150, CUFA_nomin_diff = combined_mean_diffs_nomin)#
 #
-hydro <- cbind(hydro, recess_1d, recess_2d, recess_3d, recess_4d, recess_5d, recess_6d, recess_7d, recess_14d, recess_30d, recess_45d)#
-colnames(hydro)[5:14] <- c("recess_1d", "recess_2d", "recess_3d", "recess_4d", "recess_5d", "recess_6d", "recess_7d", "recess_14d", "recess_30d", "recess_45d")#
+# Arrange data according to day of the year#
+combined_hydro_means <- melt(combined_hydro_means, id.vars = "doy")#
+head(combined_hydro_means)#
 #
-#### Process Q-model bins #####
-# Model Q-bins were selected so that inundation areas increased by less than 15% between the discharge associated with each bin#
-# q_bin <- c(719, 1209, 2100, 4000, 6296, 11300)#
-q_bin <- c(1000, 1200, 1400, 1600, 1800, 2000, 2200)#
+#### Plot the data #####
+# Custom theme#
+# Specify a custom theme for plotting.#
+theme_tufte <- function(ticks=TRUE, base_family="Lato", base_size=11) {#
+  ret <- theme_bw(base_family=base_family, base_size=base_size) +#
+    theme(#
+      legend.background  = element_blank(),#
+      legend.key        	= element_blank(),#
+      panel.background  	= element_blank(),#
+      panel.border      	= element_blank(),#
+      strip.background  	= element_blank(),#
+      plot.background   	= element_blank(),#
+      axis.line         	= element_line(color="black", size=0.35),#
+      panel.margin 	  	= unit(1.5, "lines"))#
+  if (!ticks) {#
+    ret <- ret + theme(axis.ticks = element_blank())#
+  }#
+  ret#
+}#
 #
-# Calculate probability of flooding in each bin for the entire year#
-q_bin_prob <- q.prob(hydro, q_bin)#
+# Create ggplot#
 #
-# Calculate probabilities in each bin according to discrete timing states#
-# The discrete timing states are April-May, June-July, August-September#
-hydro_monthly <- subset.month(hydro)#
+hydroplot <- ggplot(data = combined_hydro_means, aes(x = doy, y = value, group = variable, linetype = variable))#
+hydroplot <- hydroplot + geom_line()#
+hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x="Day of the Year", y="Mean Discharge (cfs)")#
+hydroplot <- hydroplot + theme_tufte()#
+hydroplot#
 #
-apr_may <- list.to.df(hydro_monthly[[1]])#
-jun_jul <- list.to.df(hydro_monthly[[2]])#
-aug_sep <- list.to.df(hydro_monthly[[3]])#
+hydroplot <- ggplot(data = combined_hydro_means, aes(x = doy, y = value, group = variable, linetype = variable, linewidth = 0.5))#
+hydroplot <- hydroplot + geom_line()#
+hydroplot <- hydroplot + scale_linetype_manual(name = "Scenario", values= c("Gila_Gila" = 1, "CUFA_150" = 2, "CUFA_nomin" = 3, "CUFA_150_diff" = 2, "CUFA_nomin_diff" = 3))#
+hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x="Day of the Year", y="Mean Discharge (cfs)")#
+hydroplot <- hydroplot + theme_tufte()#
+hydroplot#
+ggsave("hydroplot.pdf", hydroplot, width=11, height=4)#
 #
-q_prob_apr_may <- q.prob(apr_may, q_bin)#
-q_prob_jun_jul <- q.prob(jun_jul, q_bin)#
-q_prob_aug_sep <- q.prob(aug_sep, q_bin)#
+hydroplot2 <- ggplot(data = combined_hydro_melt, aes(x = doy, y = value, group = variable, color = variable))#
+hydroplot2 <- hydroplot2 + stat_summary(fun.y = "mean", geom = "line")#
+hydroplot2
+Load libraries #####
+library(reshape2)#
+library(ggplot2)#
+library(scales) # Library for modifying scales on plots#
+library(grid) # Library for developing nonstandard plotting themes#
+library(extrafont)      # Library for embedding system fonds in pdf plots#
+loadfonts()             # Loads system fonts into R. If you want to output to .ps files instead of .pdf, use:   #
+                        # loadfonts(device="postscript")#
 #
-q_prob_all <- data.frame(q_prob_apr_may, q_prob_jun_jul, q_prob_aug_sep)#
-# write.table(q_prob_all, "output/q_prob_all.txt", sep="\t")#
+#### Set working directory #####
+setwd("/Users/Morrison/Dropbox/Gila Bayesian/bayesian_network")#
 #
-# Test calculations#
-# R <- probspace(apr_may)#
-# Y <- prob(R, cfs>=719)#
-##
-# C <- count(apr_may$cfs>=719)#
+#### Source common functions #####
+source('~/Dropbox/Gila Bayesian/bayesian_network/1-functions.R')#
 #
-#### Calculate probabilities for recession rates #####
-# Test calculations#
-# S <- probspace(apr_may)#
-# P <- prob(S, recess_6d>=6)#
-# X <- S[["recess_1d"]]#
+#### Load hydrology data #####
 #
-# Set discrete states for recession rates (in cm/day)#
-recess_rates <- c(0, 1, 3, 6)#
+# Add the Gila at Gila USGS gage data#
+hydro <- usgs.process("data/usgs_09430500_daily.txt")#
 #
-# Calculate recession rate probabilities for April-May#
-recess_1d_apr_may <- r.prob(apr_may, "recess_1d", recess_rates)#
-recess_2d_apr_may <- r.prob(apr_may, "recess_2d", recess_rates)#
-recess_3d_apr_may <- r.prob(apr_may, "recess_3d", recess_rates)#
-recess_4d_apr_may <- r.prob(apr_may, "recess_4d", recess_rates)#
-recess_5d_apr_may <- r.prob(apr_may, "recess_5d", recess_rates)#
-recess_6d_apr_may <- r.prob(apr_may, "recess_6d", recess_rates)#
-recess_7d_apr_may <- r.prob(apr_may, "recess_7d", recess_rates)#
-recess_14d_apr_may <- r.prob(apr_may, "recess_14d", recess_rates)#
-recess_30d_apr_may <- r.prob(apr_may, "recess_30d", recess_rates)#
-recess_45d_apr_may <- r.prob(apr_may, "recess_45d", recess_rates)#
+# Read data for the scenarios#
+CUFA_150 <- scenario.process("data/scenarios.csv", 3)#
+CUFA_nomin <- scenario.process("data/scenarios.csv", 4)#
 #
-recess_all_apr_may <- cbind(recess_1d_apr_may, recess_2d_apr_may, recess_3d_apr_may, recess_4d_apr_may, recess_5d_apr_may, recess_6d_apr_may, recess_7d_apr_may, recess_14d_apr_may, recess_30d_apr_may, recess_45d_apr_may)#
-colnames(recess_all_apr_may) <- c("recess_1d", "recess_2d", "recess_3d", "recess_4d", "recess_5d", "recess_6d", "recess_7d", "recess_14d", "recess_30d", "recess_45d")#
-rownames(recess_all_apr_may) <- c("<0", "0-1", "1-3", "3-6", ">6")#
-recess_all_apr_may <- t(recess_all_apr_may)#
-# write.table(recess_all_apr_may, "output/recess_all_apr_may.txt", sep="\t")#
+#### Organize hydrology data #####
 #
-# Calculate recession rate probabilities for June-July#
-recess_1d_jun_jul <- r.prob(jun_jul, "recess_1d", recess_rates)#
-recess_2d_jun_jul <- r.prob(jun_jul, "recess_2d", recess_rates)#
-recess_3d_jun_jul <- r.prob(jun_jul, "recess_3d", recess_rates)#
-recess_4d_jun_jul <- r.prob(jun_jul, "recess_4d", recess_rates)#
-recess_5d_jun_jul <- r.prob(jun_jul, "recess_5d", recess_rates)#
-recess_6d_jun_jul <- r.prob(jun_jul, "recess_6d", recess_rates)#
-recess_7d_jun_jul <- r.prob(jun_jul, "recess_7d", recess_rates)#
-recess_14d_jun_jul <- r.prob(jun_jul, "recess_14d", recess_rates)#
-recess_30d_jun_jul <- r.prob(jun_jul, "recess_30d", recess_rates)#
-recess_45d_jun_jul <- r.prob(jun_jul, "recess_45d", recess_rates)#
+# The datasets have different lengths and need to match, so the hydro dataset is trimmed#
+hydro <- hydro[hydro[ ,1] %in% CUFA_150[ ,1], ]#
 #
-recess_all_jun_jul <- cbind(recess_1d_jun_jul, recess_2d_jun_jul, recess_3d_jun_jul, recess_4d_jun_jul, recess_5d_jun_jul, recess_6d_jun_jul, recess_7d_jun_jul, recess_14d_jun_jul, recess_30d_jun_jul, recess_45d_jun_jul)#
-colnames(recess_all_jun_jul) <- c("recess_1d", "recess_2d", "recess_3d", "recess_4d", "recess_5d", "recess_6d", "recess_7d", "recess_14d", "recess_30d", "recess_45d")#
-rownames(recess_all_jun_jul) <- c("<0", "0-1", "1-3", "3-6", ">6")#
-recess_all_jun_jul <- t(recess_all_jun_jul)#
-# write.table(recess_all_jun_jul, "output/recess_all_jun_jul.txt", sep="\t")#
+# Combine all datasets into one data frame#
+combined_hydro <- data.frame(date = hydro$date, Gila_Gila = hydro$cfs, CUFA_150 = CUFA_150$cfs, CUFA_nomin = CUFA_nomin$cfs)#
 #
-# Calculate recession rate probabilities for August-September#
-recess_1d_aug_sep <- r.prob(aug_sep, "recess_1d", recess_rates)#
-recess_2d_aug_sep <- r.prob(aug_sep, "recess_2d", recess_rates)#
-recess_3d_aug_sep <- r.prob(aug_sep, "recess_3d", recess_rates)#
-recess_4d_aug_sep <- r.prob(aug_sep, "recess_4d", recess_rates)#
-recess_5d_aug_sep <- r.prob(aug_sep, "recess_5d", recess_rates)#
-recess_6d_aug_sep <- r.prob(aug_sep, "recess_6d", recess_rates)#
-recess_7d_aug_sep <- r.prob(aug_sep, "recess_7d", recess_rates)#
-recess_14d_aug_sep <- r.prob(aug_sep, "recess_14d", recess_rates)#
-recess_30d_aug_sep <- r.prob(aug_sep, "recess_30d", recess_rates)#
-recess_45d_aug_sep <- r.prob(aug_sep, "recess_45d", recess_rates)#
+# Add day of year to the data frame so flows can be averaged across the time series#
+doy <- as.numeric(strftime(combined_hydro$date, format = "%j")) # Get day of the year value from dates#
+combined_hydro <- cbind(doy, combined_hydro[ ,2:4], doy)#
 #
-recess_all_aug_sep <- cbind(recess_1d_aug_sep, recess_2d_aug_sep, recess_3d_aug_sep, recess_4d_aug_sep, recess_5d_aug_sep, recess_6d_aug_sep, recess_7d_aug_sep, recess_14d_aug_sep, recess_30d_aug_sep, recess_45d_aug_sep)#
-colnames(recess_all_aug_sep) <- c("recess_1d", "recess_2d", "recess_3d", "recess_4d", "recess_5d", "recess_6d", "recess_7d", "recess_14d", "recess_30d", "recess_45d")#
-rownames(recess_all_aug_sep) <- c("<0", "0-1", "1-3", "3-6", ">6")#
-recess_all_aug_sep <- t(recess_all_aug_sep)#
-# recess_all_aug_sep[,5] <- recess_all_aug_sep[,5] + 0.0002154 # Add small number to get probability sums to equal 1#
-# write.table(recess_all_aug_sep, "output/recess_all_aug_sep.txt", sep="\t")#
+# Arrange the data frame according to day of the year#
+combined_hydro_melt <- melt(combined_hydro, id.vars = "doy")#
+head(combined_hydro_melt)#
 #
-recess_prob_all <- cbind(recess_all_apr_may, recess_all_jun_jul, recess_all_aug_sep)#
-# write.table(recess_prob_all, "output/recess_prob_all.txt", sep="\t")#
-# recess_prob_all[,5] <- recess_prob_all[,5] + 0.00215#
+# Calculate mean discharge for each day of the year#
+combined_hydro_means <- dcast(combined_hydro_melt, doy~variable, mean)#
+combined_hydro_means#
 #
-#### Populate network states based on scenarios #####
-# Discrete states (1, 2, 3) based on the timing#
-timing_state <- timing.states(hydro)#
+# Calculate difference in means between Gila-Gila and each scenario#
+combined_mean_diffs_150 <- combined_hydro_means$CUFA_150 - combined_hydro_means$Gila_Gila#
+combined_mean_diffs_nomin <- combined_hydro_means$CUFA_nomin - combined_hydro_means$Gila_Gila#
 #
-# Discrete states (Y, N) based on inundation#
-q1_state <- q.states(hydro, q_bin, 1)#
-q2_state <- q.states(hydro, q_bin, 2)#
-q3_state <- q.states(hydro, q_bin, 3)#
-q4_state <- q.states(hydro, q_bin, 4)#
-q5_state <- q.states(hydro, q_bin, 5)#
-q6_state <- q.states(hydro, q_bin, 6)#
+combined_hydro_means <- data.frame(combined_hydro_means, CUFA_150_diff = combined_mean_diffs_150, CUFA_nomin_diff = combined_mean_diffs_nomin)#
 #
-# Discrete states based on recession rates#
-recess_state <- recess.states(hydro, recess_rates, "recess_14d")#
+# Arrange data according to day of the year#
+combined_hydro_means <- melt(combined_hydro_means, id.vars = "doy")#
+head(combined_hydro_means)#
 #
-# Combine discrete states into single data frame#
-# q1_all_states <- cbind(timing_state, q1_state, recess_state)#
-# q2_all_states <- cbind(timing_state, q2_state, recess_state)#
-# q3_all_states <- cbind(timing_state, q3_state, recess_state)#
-# q4_all_states <- cbind(timing_state, q4_state, recess_state)#
-# q5_all_states <- cbind(timing_state, q5_state, recess_state)#
-# q6_all_states <- cbind(timing_state, q6_state, recess_state)#
+#### Plot the data #####
+# Custom theme#
+# Specify a custom theme for plotting.#
+theme_tufte <- function(ticks=TRUE, base_family="Lato", base_size=11) {#
+  ret <- theme_bw(base_family=base_family, base_size=base_size) +#
+    theme(#
+      legend.background  = element_blank(),#
+      legend.key        	= element_blank(),#
+      panel.background  	= element_blank(),#
+      panel.border      	= element_blank(),#
+      strip.background  	= element_blank(),#
+      plot.background   	= element_blank(),#
+      axis.line         	= element_line(color="black", size=0.35),#
+      panel.margin 	  	= unit(1.5, "lines"))#
+  if (!ticks) {#
+    ret <- ret + theme(axis.ticks = element_blank())#
+  }#
+  ret#
+}#
 #
-# # Remove evidence when FLOODING == N or RECESSION == 1 or RECESSION == 5#
-# q1_trim_states <- subset(q1_all_states, TIMING != "NA" & FLOOD == "Y")#
-# q2_trim_states <- subset(q2_all_states, TIMING != "NA" & FLOOD == "Y")#
-# q3_trim_states <- subset(q3_all_states, TIMING != "NA" & FLOOD == "Y")#
-# q4_trim_states <- subset(q4_all_states, TIMING != "NA" & FLOOD == "Y")#
-# q5_trim_states <- subset(q5_all_states, TIMING != "NA" & FLOOD == "Y")#
-# q6_trim_states <- subset(q6_all_states, TIMING != "NA" & FLOOD == "Y")#
+# Create ggplot#
 #
-# q1_trim_states <- subset(q1_all_states, TIMING != "NA" & FLOOD == "Y" & RECESSION != "1" & RECESSION != "5")#
-# q2_trim_states <- subset(q2_all_states, TIMING != "NA" & FLOOD == "Y" & RECESSION != "1" & RECESSION != "5")#
-# q3_trim_states <- subset(q3_all_states, TIMING != "NA" & FLOOD == "Y" & RECESSION != "1" & RECESSION != "5")#
-# q4_trim_states <- subset(q4_all_states, TIMING != "NA" & FLOOD == "Y" & RECESSION != "1" & RECESSION != "5")#
-# q5_trim_states <- subset(q5_all_states, TIMING != "NA" & FLOOD == "Y" & RECESSION != "1" & RECESSION != "5")#
-# q6_trim_states <- subset(q6_all_states, TIMING != "NA" & FLOOD == "Y" & RECESSION != "1" & RECESSION != "5")#
+hydroplot <- ggplot(data = combined_hydro_means, aes(x = doy, y = value, group = variable, linetype = variable))#
+hydroplot <- hydroplot + geom_line()#
+hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x="Day of the Year", y="Mean Discharge (cfs)")#
+hydroplot <- hydroplot + theme_tufte()#
+hydroplot#
 #
-# all_trim_states <- list(q1_trim_states, q2_trim_states, q3_trim_states, q4_trim_states, q5_trim_states, q6_trim_states)#
-# all_trim_states
-Load packages #####
-# Load "bnlearn" package#
-library(bnlearn)#
-#
-# Name network variables#
-riparian_var <- c("TIMING", "FLOOD", "RECESSION", "HYDRO", "DEPTH", "POTENTIAL")#
-#
-# Create empty network#
-riparian_dag <- empty.graph(riparian_var)#
-#
-# riparian_test <- model2network("[TIMING][DEPTH][FLOOD|TIMING][RECESSION|TIMING][HYDRO|FLOOD:RECESSION][POTENTIAL|HYDRO:DEPTH]")#
-#
-# Connect variables with directed arcs#
-arcs(riparian_dag) <- matrix(#
-	c("TIMING", "FLOOD", "TIMING", "RECESSION", "RECESSION", "HYDRO", "FLOOD", "HYDRO", "DEPTH", "POTENTIAL", "HYDRO", "POTENTIAL"),#
-	ncol = 2, byrow = TRUE,#
-	dimnames = list(c(), c("from", "to")))#
-#
-#### Discrete States #####
-# Set discrete states for each node#
-#
-# Key to timing statess: 1 = May-June; 2 = July-August, 3 = September-October#
-dim_TIMING <- c(1, 2, 3)#
-# Key to flooding states: Y = yes; N = no#
-# dim_FLOOD <- c("Y", "N")#
-dim_FLOOD <- c(1, 0)#
-# dim_FLOOD <- c("TRUE", "FALSE") # USE FOR WINDOWS#
-# Key to recession states: 1 = < 0cm/day 2 = 0-1 cm/day; 3 = 1-3 cm/day; 4 = 3-6 cm/day, 5 = > 6 cm/day#
-dim_RECESSION <- c(1, 2, 3, 4, 5)#
-# Key to hydrologic condition states: L=low; M=medium; H=high#
-# dim_HYDRO <- c("L", "M", "H")#
-dim_HYDRO <- c("L", "H")#
-# Key to groundwater depth states: 1 = < 50 cm; 2 = 50-200 cm; 3 = > 200 cm#
-dim_DEPTH <- c(1, 2, 3)#
-# Key to recruitment potential states: L=low; M=medium; H=high#
-# dim_POTENTIAL <- c("L", "M", "H")#
-dim_POTENTIAL <- c("Y", "N")#
-#### CPT Assignments #####
-cpt_TIMING <- matrix(c(0.65, 0.25, 0.1), ncol=3, dimnames=list(NULL, "TIMING"=dim_TIMING))#
-cpt_FLOOD1 <- matrix(as.matrix(q_prob_all[2,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_FLOOD2 <- matrix(as.matrix(q_prob_all[3,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_FLOOD3 <- matrix(as.matrix(q_prob_all[4,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_FLOOD4 <- matrix(as.matrix(q_prob_all[5,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_FLOOD5 <- matrix(as.matrix(q_prob_all[6,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_FLOOD6 <- matrix(as.matrix(q_prob_all[7,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_FLOOD7 <- matrix(as.matrix(q_prob_all[8,]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))#
-cpt_RECESSION <- matrix(recess_prob_all[8,], ncol=3, dimnames=list("RECESSION"=dim_RECESSION, "TIMING"=dim_TIMING)) # Row 8 refers to the 14-day avg forward recession rate#
-# cpt_HYDRO <- matrix(c(1, 0, 0, 1, 0, 0, 0.05, 0.35, 0.6, 1, 0, 0, 0.1, 0.5, 0.4, 1, 0, 0, 0.1, 0.6, 0.3, 1, 0, 0, 1, 0, 0, 1, 0, 0))#
-# cpt_HYDRO <- matrix(c(0.9, 0.05, 0.05, 0.9, 0.05, 0.05, 0.05, 0.35, 0.6, 0.9, 0.05, 0.05, 0.1, 0.4, 0.5, 0.9, 0.05, 0.05, 0.1, 0.6, 0.3, 0.9, 0.05, 0.05, 0.9, 0.05, 0.05, 0.9, 0.05, 0.05))#
-# cpt_HYDRO <- matrix(c(1, 0, 0, 1, 0, 0, 0.05, 0.35, 0.6, 1, 0, 0, 0.1, 0.4, 0.5, 1, 0, 0, 0.1, 0.6, 0.3, 1, 0, 0, 1, 0, 0, 1, 0, 0))#
-cpt_HYDRO <- matrix(c(1, 0, 1, 0, 0.05, 0.95, 1, 0, 0.1, 0.9, 1, 0, 0.3, 0.7, 1, 0, 0.9, 0.1, 1, 0))#
-dim(cpt_HYDRO) <- c(2, 2, 5)#
-dimnames(cpt_HYDRO) <- list("HYDRO"=dim_HYDRO, "FLOOD"=dim_FLOOD, "RECESSION"=dim_RECESSION)#
-cpt_DEPTH <- matrix(c(0.33, 0.33, 0.34), ncol=3, dimnames=list(NULL, "DEPTH"=dim_DEPTH))#
-# cpt_POTENTIAL <- matrix(c(0.3, 0.7, 0.4, 0.6, 0.5, 0.5, 0.5, 0.5, 0.6, 0.4, 0.7, 0.3, 0.3,0.7, 0.4, 0.6, 0.5, 0.5), ncol=3)#
-# cpt_POTENTIAL <- matrix(c(0, 1, 0.4, 0.6, 0.5, 0.5, 0.5, 0.5, 0.6, 0.4, 0.7, 0.3, 0, 1, 0.4, 0.6, 0.5, 0.5), ncol=3)#
-cpt_POTENTIAL <- matrix(c(0, 1, 0.7, 0.3, 0, 1, 0.9, 0.1, 0, 1, 0.7, 0.3), ncol=3)#
-dim(cpt_POTENTIAL) <- c(2, 2, 3)#
-dimnames(cpt_POTENTIAL) <- list("POTENTIAL"=dim_POTENTIAL, "HYDRO"=dim_HYDRO, "DEPTH"=dim_DEPTH)#
-# cpt_POTENTIAL <- matrix(c(0.8, 0.1, 0.1, 0.3, 0.5, 0.2, 0.1, 0.3, 0.6, 0.75, 0.15, 0.1, 0.2, 0.4, 0.4, 0.05, 0.2, 0.75, 0.9, 0.05, 0.05, 0.3, 0.5, 0.2, 0.2, 0.4, 0.4))#
-# dim(cpt_POTENTIAL) <- c(3, 3, 3)#
-# dimnames(cpt_POTENTIAL) <- list("POTENTIAL"=dim_POTENTIAL, "HYDRO"=dim_HYDRO, "DEPTH"=dim_DEPTH)#
-#
-riparian.fit1 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD1, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-riparian.fit2 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD2, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-riparian.fit3 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD3, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-riparian.fit4 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD4, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-riparian.fit5 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD5, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-riparian.fit6 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD6, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-riparian.fit7 <- custom.fit(riparian_dag, dist=list(TIMING=cpt_TIMING, FLOOD=cpt_FLOOD7, RECESSION=cpt_RECESSION, HYDRO=cpt_HYDRO, DEPTH=cpt_DEPTH, POTENTIAL=cpt_POTENTIAL))#
-#
-# plot(riparian_dag)#
-#
-# replicate(table(cpdist(riparian.fit, "POTENTIAL", (TIMING=="1" & FLOOD=="Y" & RECESSION=="3"))), n=10)#
-#
-# ti <- as.factor(rep(1, each=10))#
-# q <- c("Y", "N", "N", "N", "Y", "Y", "Y", "Y", "N", "Y")#
-# re <- as.factor(rep(1:5, each=2))#
-# tdf <- data.frame(TIMING=ti, FLOOD=q, RECESSION=re)#
-#
-# ev <- list(FLOOD="1", RECESSION="2", TIMING="2")#
-# cpquery(riparian.fit1, POTENTIAL=="Y", evidence=ev, method="lw")
-colSums(cpt_RECESSION[,1:3])
+hydroplot <- ggplot(data = combined_hydro_means, aes(x = doy, y = value, group = variable, linetype = variable, linewidth = 0.5))#
+hydroplot <- hydroplot + geom_line()#
+hydroplot <- hydroplot + scale_linetype_manual(name = "Scenario", values= c("Gila_Gila" = 1, "CUFA_150" = 2, "CUFA_nomin" = 3, "CUFA_150_diff" = 2, "CUFA_nomin_diff" = 3))#
+hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x="Day of the Year", y="Mean Discharge (cfs)")#
+hydroplot <- hydroplot + theme_tufte()#
+hydroplot#
+ggsave("hydroplot.pdf", hydroplot, width=11, height=4)
