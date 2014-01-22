@@ -33,8 +33,9 @@ combined_all_sites <- rbind(combined_site1, combined_site2, combined_site4)
 load("output/combined_site1.Rdata")
 load("output/combined_site2.Rdata")
 load("output/combined_site4.Rdata")
+load("output/combined_site5.Rdata")
 
-combined_all_sites <- rbind(combined_site1, combined_site2, combined_site4)
+combined_all_sites <- rbind(combined_site1, combined_site2, combined_site4, combined_site5)
 
 test <- ggplot(data = combined_all_sites, aes(x = scenario, y = util_prob))
 test <- test + geom_boxplot()

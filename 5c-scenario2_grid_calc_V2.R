@@ -3,7 +3,7 @@
 set.seed(140)
 
 # Change input table depending on the site number
-CUFA_nomin_alldata <- read.table("data/site4_1000_to_4000.txt", header=FALSE, skip=0)
+CUFA_nomin_alldata <- read.table("data/site5_1000_to_4000.txt", header=FALSE, skip=0)
 
 colnames(CUFA_nomin_alldata) <- c("cell", "flood_cfs")
 
@@ -23,7 +23,7 @@ CUFA_nomin_hydro_states <- subset(CUFA_nomin_hydro_states, TIMING != "NA" & RECE
 CUFA_nomin_timing_subset <- CUFA_nomin_hydro_states[,15]
 CUFA_nomin_recess_subset <- CUFA_nomin_hydro_states[,16]
 
-save(CUFA_nomin_hydro_states, file="output/site4/CUFA_nomin_hydro_states.Rdata")
+save(CUFA_nomin_hydro_states, file="output/site5/CUFA_nomin_hydro_states.Rdata")
 
 #### Allow dimension naming using the "bigmemory" package ####
 options(bigmemory.allow.dimnames=TRUE)
@@ -106,13 +106,13 @@ CUFA_nomin_evidence4 <- populate.evidence(CUFA_nomin_q4_cells, CUFA_nomin_emptym
 CUFA_nomin_evidence5 <- populate.evidence(CUFA_nomin_q5_cells, CUFA_nomin_emptymatrix5)
 CUFA_nomin_evidence6 <- populate.evidence(CUFA_nomin_q6_cells, CUFA_nomin_emptymatrix6)
 CUFA_nomin_evidence7 <- populate.evidence(CUFA_nomin_q7_cells, CUFA_nomin_emptymatrix7)
-save(CUFA_nomin_evidence1, file="output/site4/CUFA_nomin_evidence1.Rdata")
-save(CUFA_nomin_evidence2, file="output/site4/CUFA_nomin_evidence2.Rdata")
-save(CUFA_nomin_evidence3, file="output/site4/CUFA_nomin_evidence3.Rdata")
-save(CUFA_nomin_evidence4, file="output/site4/CUFA_nomin_evidence4.Rdata")
-save(CUFA_nomin_evidence5, file="output/site4/CUFA_nomin_evidence5.Rdata")
-save(CUFA_nomin_evidence6, file="output/site4/CUFA_nomin_evidence6.Rdata")
-save(CUFA_nomin_evidence7, file="output/site4/CUFA_nomin_evidence7.Rdata")
+save(CUFA_nomin_evidence1, file="output/site5/CUFA_nomin_evidence1.Rdata")
+save(CUFA_nomin_evidence2, file="output/site5/CUFA_nomin_evidence2.Rdata")
+save(CUFA_nomin_evidence3, file="output/site5/CUFA_nomin_evidence3.Rdata")
+save(CUFA_nomin_evidence4, file="output/site5/CUFA_nomin_evidence4.Rdata")
+save(CUFA_nomin_evidence5, file="output/site5/CUFA_nomin_evidence5.Rdata")
+save(CUFA_nomin_evidence6, file="output/site5/CUFA_nomin_evidence6.Rdata")
+save(CUFA_nomin_evidence7, file="output/site5/CUFA_nomin_evidence7.Rdata")
 
 
 # a <- vector("list", nrow(q1_cells))
@@ -152,19 +152,19 @@ save(CUFA_nomin_evidence7, file="output/site4/CUFA_nomin_evidence7.Rdata")
 
 #### Calculate recruitment probability by instantiating the BN with evidence ####
 system.time(CUFA_nomin_q1_cell_probs <- lapply(CUFA_nomin_evidence1, apply, 1, function(x) cpquery(riparian.fit1, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q1_cell_probs, file="output/site4/CUFA_nomin_q1_cell_probs.Rdata")
+save(CUFA_nomin_q1_cell_probs, file="output/site5/CUFA_nomin_q1_cell_probs.Rdata")
 system.time(CUFA_nomin_q2_cell_probs <- lapply(CUFA_nomin_evidence2, apply, 1, function(x) cpquery(riparian.fit2, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q2_cell_probs, file="output/site4/CUFA_nomin_q2_cell_probs.Rdata")
+save(CUFA_nomin_q2_cell_probs, file="output/site5/CUFA_nomin_q2_cell_probs.Rdata")
 system.time(CUFA_nomin_q3_cell_probs <- lapply(CUFA_nomin_evidence3, apply, 1, function(x) cpquery(riparian.fit3, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q3_cell_probs, file="output/site4/CUFA_nomin_q3_cell_probs.Rdata")
+save(CUFA_nomin_q3_cell_probs, file="output/site5/CUFA_nomin_q3_cell_probs.Rdata")
 system.time(CUFA_nomin_q4_cell_probs <- lapply(CUFA_nomin_evidence4, apply, 1, function(x) cpquery(riparian.fit4, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q4_cell_probs, file="output/site4/CUFA_nomin_q4_cell_probs.Rdata")
+save(CUFA_nomin_q4_cell_probs, file="output/site5/CUFA_nomin_q4_cell_probs.Rdata")
 system.time(CUFA_nomin_q5_cell_probs <- lapply(CUFA_nomin_evidence5, apply, 1, function(x) cpquery(riparian.fit5, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q5_cell_probs, file="output/site4/CUFA_nomin_q5_cell_probs.Rdata")
+save(CUFA_nomin_q5_cell_probs, file="output/site5/CUFA_nomin_q5_cell_probs.Rdata")
 system.time(CUFA_nomin_q6_cell_probs <- lapply(CUFA_nomin_evidence6, apply, 1, function(x) cpquery(riparian.fit6, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q6_cell_probs, file="output/site4/CUFA_nomin_q6_cell_probs.Rdata")
+save(CUFA_nomin_q6_cell_probs, file="output/site5/CUFA_nomin_q6_cell_probs.Rdata")
 system.time(CUFA_nomin_q7_cell_probs <- lapply(CUFA_nomin_evidence7, apply, 1, function(x) cpquery(riparian.fit7, (POTENTIAL=="Y"), evidence=as.list(x), method="lw")))
-save(CUFA_nomin_q7_cell_probs, file="output/site4/CUFA_nomin_q7_cell_probs.Rdata")
+save(CUFA_nomin_q7_cell_probs, file="output/site5/CUFA_nomin_q7_cell_probs.Rdata")
 
 CUFA_nomin_q1_cell_prob_mn <- t(data.frame(lapply(CUFA_nomin_q1_cell_probs, mean, na.rm=TRUE), check.names=FALSE))
 CUFA_nomin_q2_cell_prob_mn <- t(data.frame(lapply(CUFA_nomin_q2_cell_probs, mean, na.rm=TRUE), check.names=FALSE))
@@ -201,44 +201,44 @@ if (!exists("CUFA_nomin_q7_cell_prob_mn")) CUFA_nomin_q_all_prob_mn <- rbind(CUF
 # if (!exists("q6_prob_mn_norm")) q_all_mn_norm_e <- rbind(q1_prob_mn_norm, q2_prob_mn_norm, q3_prob_mn_norm, q4_prob_mn_norm, q5_prob_mn_norm)
 
 #### Write csv file output ####
-# write.csv(q1_prob_mn_norm, file="output/site4/q1_prob_mn_norm_e.csv")
-# write.csv(q2_prob_mn_norm, file="output/site4/q2_prob_mn_norm_e.csv")
-# write.csv(q3_prob_mn_norm, file="output/site4/q3_prob_mn_norm_e.csv")
-# write.csv(q4_prob_mn_norm, file="output/site4/q4_prob_mn_norm_e.csv")
-# write.csv(q5_prob_mn_norm, file="output/site4/q5_prob_mn_norm_e.csv")
-# write.csv(q6_prob_mn_norm, file="output/site4/q6_prob_mn_norm_e.csv")
+# write.csv(q1_prob_mn_norm, file="output/site5/q1_prob_mn_norm_e.csv")
+# write.csv(q2_prob_mn_norm, file="output/site5/q2_prob_mn_norm_e.csv")
+# write.csv(q3_prob_mn_norm, file="output/site5/q3_prob_mn_norm_e.csv")
+# write.csv(q4_prob_mn_norm, file="output/site5/q4_prob_mn_norm_e.csv")
+# write.csv(q5_prob_mn_norm, file="output/site5/q5_prob_mn_norm_e.csv")
+# write.csv(q6_prob_mn_norm, file="output/site5/q6_prob_mn_norm_e.csv")
 
 # Export File
-write.csv(CUFA_nomin_q_all_prob_mn, file="output/site4/CUFA_nomin_q_all_prob_mn.csv")
-CUFA_nomin_q_all_prob_mn2 <- read.csv("output/site4/CUFA_nomin_q_all_prob_mn.csv")
+write.csv(CUFA_nomin_q_all_prob_mn, file="output/site5/CUFA_nomin_q_all_prob_mn.csv")
+CUFA_nomin_q_all_prob_mn2 <- read.csv("output/site5/CUFA_nomin_q_all_prob_mn.csv")
 colnames(CUFA_nomin_q_all_prob_mn2) <- c("cell","mean_prob")
 CUFA_nomin_q_all_prob_mn2 <- CUFA_nomin_q_all_prob_mn2[order(CUFA_nomin_q_all_prob_mn2$cell),]
-write.csv(CUFA_nomin_q_all_prob_mn2, file="output/site4/CUFA_nomin_q_all_prob_mn.csv", row.names=FALSE)
+write.csv(CUFA_nomin_q_all_prob_mn2, file="output/site5/CUFA_nomin_q_all_prob_mn.csv", row.names=FALSE)
 
 # Site 2
-# write.csv(q_all_mn_norm_e, file="output/site4/q_all_mn_norm_site4_e.csv")
-# q_all_mn_norm_e2 <- read.csv("output/site4/q_all_mn_norm_site4_e.csv")
+# write.csv(q_all_mn_norm_e, file="output/site5/q_all_mn_norm_site5_e.csv")
+# q_all_mn_norm_e2 <- read.csv("output/site5/q_all_mn_norm_site5_e.csv")
 # colnames(q_all_mn_norm_e2) <- c("cell","mean_prob")
 # q_all_mn_norm_e2 <- q_all_mn_norm_e2[order(q_all_mn_norm_e2$cell),]
-# write.csv(q_all_mn_norm_e2, file="output/site4/q_all_mn_norm_site4_e.csv", row.names=FALSE)
+# write.csv(q_all_mn_norm_e2, file="output/site5/q_all_mn_norm_site5_e.csv", row.names=FALSE)
 
 # Site 3
-# write.csv(q_all_mn_norm_e, file="output/site4/q_all_mn_norm_site4_e.csv")
-# q_all_mn_norm_e2 <- read.csv("output/site4/q_all_mn_norm_site4_e.csv")
+# write.csv(q_all_mn_norm_e, file="output/site5/q_all_mn_norm_site5_e.csv")
+# q_all_mn_norm_e2 <- read.csv("output/site5/q_all_mn_norm_site5_e.csv")
 # colnames(q_all_mn_norm_e2) <- c("cell","mean_prob")
 # q_all_mn_norm_e2 <- q_all_mn_norm_e2[order(q_all_mn_norm_e2$cell),]
-# write.csv(q_all_mn_norm_e2, file="output/site4/q_all_mn_norm_site4_e.csv", row.names=FALSE)
+# write.csv(q_all_mn_norm_e2, file="output/site5/q_all_mn_norm_site5_e.csv", row.names=FALSE)
 
 # # Site 4
-# write.csv(q_all_mn_norm_e, file="output/site4/q_all_mn_norm_site4_e.csv")
-# q_all_mn_norm_e2 <- read.csv("output/site4/q_all_mn_norm_site4_e.csv")
+# write.csv(q_all_mn_norm_e, file="output/site5/q_all_mn_norm_site5_e.csv")
+# q_all_mn_norm_e2 <- read.csv("output/site5/q_all_mn_norm_site5_e.csv")
 # colnames(q_all_mn_norm_e2) <- c("cell","mean_prob")
 # q_all_mn_norm_e2 <- q_all_mn_norm_e2[order(q_all_mn_norm_e2$cell),]
-# write.csv(q_all_mn_norm_e2, file="output/site4/q_all_mn_norm_site4_e.csv", row.names=FALSE)
+# write.csv(q_all_mn_norm_e2, file="output/site5/q_all_mn_norm_site5_e.csv", row.names=FALSE)
 
 # Site 5
-# write.csv(q_all_mn_norm_e, file="output/site4/q_all_mn_norm_site4_e.csv")
-# q_all_mn_norm_e2 <- read.csv("output/site4/q_all_mn_norm_site4_e.csv")
+# write.csv(q_all_mn_norm_e, file="output/site5/q_all_mn_norm_site5_e.csv")
+# q_all_mn_norm_e2 <- read.csv("output/site5/q_all_mn_norm_site5_e.csv")
 # colnames(q_all_mn_norm_e2) <- c("cell","mean_prob")
 # q_all_mn_norm_e2 <- q_all_mn_norm_e2[order(q_all_mn_norm_e2$cell),]
-# write.csv(q_all_mn_norm_e2, file="output/site4/q_all_mn_norm_site4_e.csv", row.names=FALSE)
+# write.csv(q_all_mn_norm_e2, file="output/site5/q_all_mn_norm_site5_e.csv", row.names=FALSE)
