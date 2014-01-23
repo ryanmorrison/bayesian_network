@@ -87,7 +87,7 @@ hydroplot <- hydroplot + scale_linetype_manual(name = "Scenario", values= c("Gil
 hydroplot <- hydroplot + scale_y_continuous(breaks = seq(-50, 500, 50)) + labs(x="Day of the Year", y="Mean Discharge (cfs)")
 hydroplot <- hydroplot + theme_tufte()
 hydroplot
-ggsave("figs/hydroplot.pdf", hydroplot, width=11, height=4)
+ggsave("figs/hydroplot.pdf", hydroplot, width=20, height=8)
 
 # hydroplot2 <- ggplot(data = combined_hydro_melt, aes(x = doy, y = value, group = variable, color = variable))
 # hydroplot2 <- hydroplot2 + stat_summary(fun.y = "mean", geom = "line")

@@ -12,6 +12,7 @@ library(sp)  # vector data
 library(raster)  # raster data
 library(rgdal)  # input/output, projections
 library(graphics)
+library(plyr)
 
 #### Load model results ####
 E_input <- read.table("data/site2_1000_to_4000.txt", header=FALSE)
@@ -238,23 +239,35 @@ E_util_site2 <- E_site2[ ,1] * E_utility_site2
 CUFA_150_util_site2 <- CUFA_150_site2[ ,1] * CUFA_150_utility_site2
 CUFA_nomin_util_site2 <- CUFA_nomin_site2[ ,1] * CUFA_nomin_utility_site2
 
+# Count the number of events in each month
+E_all_events_site2 <- c(E_evidence1, E_evidence2, E_evidence3, E_evidence4, E_evidence5, E_evidence6, E_evidence7)
+CUFA_150_all_events_site2 <- c(CUFA_150_evidence1, CUFA_150_evidence2, CUFA_150_evidence3, CUFA_150_evidence4, CUFA_150_evidence5, CUFA_150_evidence6, CUFA_150_evidence7)
+CUFA_nomin_all_events_site2 <- c(CUFA_nomin_evidence1, CUFA_nomin_evidence2, CUFA_nomin_evidence3, CUFA_nomin_evidence4, CUFA_nomin_evidence5, CUFA_nomin_evidence6, CUFA_nomin_evidence7)
+
+E_count_site2 <- countevents(E_all_events_site2)
+CUFA_150_count_site2 <- countevents(CUFA_150_all_events_site2)
+CUFA_nomin_count_site2 <- countevents(CUFA_nomin_all_events_site2)
+
 # Make one large data frame with all the data
 E_site2 <- data.frame(prob = E_site2$prob, 
                       util_prob = E_util_site2, 
                       prob_diff = E_util_site2 - E_site2$prob, 
-                      evidence = E_lengths_site2$evidence, 
+                      evidence = E_lengths_site2$evidence,
+                      E_count_site2,
                       Q_bin = E_site2$Q_bin, 
                       scenario = E_site2$scenario)
 CUFA_150_site2 <- data.frame(prob = CUFA_150_site2$prob, 
                              util_prob = CUFA_150_util_site2, 
                              prob_diff = CUFA_150_util_site2 - E_site2$prob, 
                              evidence = CUFA_150_lengths_site2$evidence, 
+                             CUFA_150_count_site2,
                              Q_bin = CUFA_150_site2$Q_bin, 
                              scenario = CUFA_150_site2$scenario)
 CUFA_nomin_site2 <- data.frame(prob = CUFA_nomin_site2$prob, 
                                util_prob = CUFA_nomin_util_site2,
                                prob_diff = CUFA_nomin_util_site2 - E_site2$prob,
                                evidence = CUFA_nomin_lengths_site2$evidence,
+                               CUFA_nomin_count_site2,
                                Q_bin = CUFA_nomin_site2$Q_bin, 
                                scenario = CUFA_nomin_site2$scenario)
 combined_site2 <- data.frame(rbind(E_site2, CUFA_150_site2, CUFA_nomin_site2), site = "site2")

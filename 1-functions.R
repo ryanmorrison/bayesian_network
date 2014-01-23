@@ -365,6 +365,16 @@ combine.lengths.CUFA.nomin <- function() {
   return(all)
 }
 
+# This function counts the number of events in each timing state
+countevents <- function(allcells) {
+  apr_may <- sapply(allcells, function(x) nrow(subset(x, x$TIMING==1)))
+  jun_jul <- sapply(allcells, function(x) nrow(subset(x, x$TIMING==2)))
+  aug_sep <- sapply(allcells, function(x) nrow(subset(x, x$TIMING==3)))
+  all <- t(rbind(apr_may, jun_jul, aug_sep))
+  return(all)
+}
+
+
 # test.function.p3 <- function(network, evidence_table) {
 #   b <- nrow(evidence_table)
 #   a <- vector(length=b)
