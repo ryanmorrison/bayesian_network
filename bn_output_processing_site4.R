@@ -197,8 +197,19 @@ CUFA_150_gis <- data.frame(site4_xy_trim,
 )
 head(CUFA_150_gis)
 
+CUFA_nomin_gis <- data.frame(site4_xy_trim, 
+                             existing_prob = E_output[, 2], 
+                             CUFA_nomin_prob = CUFA_nomin_utility_probs[, 2], 
+                             prob_diff = CUFA_nomin_prob_diffs[ ,2], 
+                             e_events = E_lengths[ ,2], 
+                             CUFA_nomin_events = CUFA_nomin_lengths[ ,2]
+)
+
+head(CUFA_nomin_gis)
+
 # Create a spatial data frame by assigning spatial coordinates to the x,y columns
 coordinates(CUFA_150_gis) <- c("x", "y")
+coordinates(CUFA_nomin_gis) <- c("x", "y")
 
 # X,Y coordinates are in New Mexico West state plane NAD83 (EPSG code 2904). This needs to be defined in the new object.
 CUFA_150_gis@proj4string # Verify that no projection is currently specified
@@ -206,8 +217,12 @@ NMWSP <- CRS("+init=epsg:2904") # NMWSP stands for New Mexico West state plane
 proj4string(CUFA_150_gis) <- NMWSP # Assign the proj4string slot the correct projection
 CUFA_150_gis@proj4string # Verify that projection has been specified
 
+proj4string(CUFA_nomin_gis) <- NMWSP # Assign the proj4string slot the correct projection
+CUFA_nomin_gis@proj4string # Verify that projection has been specified
+
 # Export data as shapefile
-writeOGR(CUFA_150_gis, "/Users/Morrison/Documents/GIS/Projects/gila bn/shapefiles/site4", "CUFA_150_gis", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(CUFA_150_gis, "/Users/Morrison/Documents/GIS/Projects/gila bn/shapefiles/site4", "CUFA_150_site4", driver="ESRI Shapefile", overwrite_layer=TRUE)
+writeOGR(CUFA_nomin_gis, "/Users/Morrison/Documents/GIS/Projects/gila bn/shapefiles/site4", "CUFA_nomin_site4", driver="ESRI Shapefile", overwrite_layer=TRUE)
 
 
 
