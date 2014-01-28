@@ -7,6 +7,9 @@
 #### Set working directory ####
 setwd("/Users/Morrison/Dropbox/Gila Bayesian/bayesian_network")
 
+#### Source common functions ####
+source('~/Dropbox/Gila Bayesian/bayesian_network/1-functions.R')
+
 # Load libraries
 library(sp)  # vector data
 library(raster)  # raster data
