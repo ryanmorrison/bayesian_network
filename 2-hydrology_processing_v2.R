@@ -44,13 +44,13 @@ hydro <- usgs.process("data/usgs_09430500_daily.txt")
 # elseif (sitenum==site5) head_conv <- function(Q) 0.1123*(Q^0.4963)
 
 # SITE 1
-# head_conv <- function(Q) 0.0011*Q
+head_conv <- function(Q) 0.0011*Q
 
 # SITE 2
 # head_conv <- function(Q) 0.0011*Q
 
 # SITE 3
-head_conv <- function(Q) 0.056*(Q^0.5612)
+# head_conv <- function(Q) 0.056*(Q^0.5612)
 
 # SITE 4
 # head_conv <- function(Q) 0.0014*(Q^0.99)

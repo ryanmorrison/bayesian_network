@@ -3,7 +3,7 @@
 set.seed(140)
 
 # Change input table depending on the site number
-CUFA_150_alldata <- read.table("data/site3_1000_to_4000.txt", header=FALSE, skip=0)
+CUFA_150_alldata <- read.table("data/site1_1000_to_4000.txt", header=FALSE, skip=0)
 
 colnames(CUFA_150_alldata) <- c("cell", "flood_cfs")
 

@@ -46,7 +46,7 @@ cpt_FLOOD4 <- matrix(as.matrix(q_prob_all[5, ]), ncol=3, dimnames=list("FLOOD"=d
 cpt_FLOOD5 <- matrix(as.matrix(q_prob_all[6, ]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))
 cpt_FLOOD6 <- matrix(as.matrix(q_prob_all[7, ]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))
 cpt_FLOOD7 <- matrix(as.matrix(q_prob_all[8, ]), ncol=3, dimnames=list("FLOOD"=dim_FLOOD, "TIMING"=dim_TIMING))
-cpt_RECESSION <- matrix(recess_prob_all[7, ], ncol=3, dimnames=list("RECESSION"=dim_RECESSION, "TIMING"=dim_TIMING)) # Row 7 refers to the 7-day avg forward recession rate
+cpt_RECESSION <- matrix(recess_prob_all[8, ], ncol=3, dimnames=list("RECESSION"=dim_RECESSION, "TIMING"=dim_TIMING)) # Row 8 refers to the 14-day avg forward recession rate
 cpt_RECESSION <- cpt.roundoff(cpt_RECESSION)
 # cpt_HYDRO <- matrix(c(1, 0, 0, 1, 0, 0, 0.05, 0.35, 0.6, 1, 0, 0, 0.1, 0.5, 0.4, 1, 0, 0, 0.1, 0.6, 0.3, 1, 0, 0, 1, 0, 0, 1, 0, 0))
 # cpt_HYDRO <- matrix(c(0.9, 0.05, 0.05, 0.9, 0.05, 0.05, 0.05, 0.35, 0.6, 0.9, 0.05, 0.05, 0.1, 0.4, 0.5, 0.9, 0.05, 0.05, 0.1, 0.6, 0.3, 0.9, 0.05, 0.05, 0.9, 0.05, 0.05, 0.9, 0.05, 0.05))

@@ -58,7 +58,7 @@ head(combined_hydro_means)
 #### Plot the data ####
 # Custom theme
 # Specify a custom theme for plotting.
-theme_tufte <- function(ticks=TRUE, base_family="Lato", base_size=11) {
+theme_tufte <- function(ticks=TRUE, base_family="Lato", base_size=13) {
   ret <- theme_bw(base_family=base_family, base_size=base_size) +
     theme(
       legend.background  = element_blank(),
@@ -90,7 +90,7 @@ hydroplot <- hydroplot + scale_linetype_manual(name = "Scenario", values= c("Gil
 hydroplot <- hydroplot + scale_y_continuous(breaks = seq(from = -4, to = 14, by = 2)) + labs(x="Day of the Year", y="Mean Discharge (cms)")
 hydroplot <- hydroplot + theme_tufte()
 hydroplot
-ggsave("figs/hydroplot.pdf", hydroplot, width=20, height=8)
+ggsave("figs/hydroplot.pdf", hydroplot, width=16, height=8)
 
 # hydroplot2 <- ggplot(data = combined_hydro_melt, aes(x = doy, y = value, group = variable, color = variable))
 # hydroplot2 <- hydroplot2 + stat_summary(fun.y = "mean", geom = "line")

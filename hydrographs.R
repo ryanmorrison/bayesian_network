@@ -18,7 +18,7 @@ hydro_melt <- melt(combined_hydro, id="Date")
 
 hydrograph <- ggplot(hydro_melt, aes(Date, value, color=variable)) + geom_line() 
 hydrograph <- hydrograph + ylim(c(0,4000)) 
-hydrograph <- hydrograph + scale_x_date(breaks="1 day", labels=date_format("%m/%d/%y"),limits = as.Date(c('1972-09-01','1972-10-01')))
+hydrograph <- hydrograph + scale_x_date(breaks="5 day", labels=date_format("%m/%d/%y"),limits = as.Date(c('1972-09-01','1972-10-01')))
 hydrograph
 
 

@@ -132,3 +132,4 @@ ggsave("figs/prob_histogram.pdf", prob_histogram, width = 18, height = 12)
 
 
 only_positive <- subset(combined_all_sites, combined_all_sites$prob_diff > 0)
+head(only_positive)
