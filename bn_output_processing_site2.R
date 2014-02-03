@@ -197,6 +197,8 @@ CUFA_150_gis <- data.frame(site2_xy_trim,
 )
 head(CUFA_150_gis)
 
+write.table(CUFA_150_gis, file = "output/site2/CUFA_150_gis_site2.txt", sep = "\t",  row.names = FALSE)
+
 CUFA_nomin_gis <- data.frame(site2_xy_trim, 
                              existing_prob = E_output[, 2], 
                              CUFA_nomin_prob = CUFA_nomin_utility_probs[, 2], 
@@ -206,6 +208,8 @@ CUFA_nomin_gis <- data.frame(site2_xy_trim,
 )
 
 head(CUFA_nomin_gis)
+
+write.table(CUFA_nomin_gis, file = "output/site2/CUFA_nomin_gis_site2.txt", sep = "\t",  row.names = FALSE)
 
 # Create a spatial data frame by assigning spatial coordinates to the x,y columns
 coordinates(CUFA_150_gis) <- c("x", "y")

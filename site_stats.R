@@ -43,7 +43,7 @@ load("output/combined_site5.Rdata")
 combined_all_sites <- rbind(combined_site1, combined_site2, combined_site3, combined_site4, combined_site5)
 
 # Specify a custom theme for plotting.
-theme_tufte <- function(ticks=TRUE, base_family="Lato", base_size=13) {
+theme_tufte <- function(ticks=TRUE, base_family="Helvetica", base_size=13) {
   ret <- theme_bw(base_family=base_family, base_size=base_size) +
     theme(
       legend.background  = element_blank(),
@@ -77,7 +77,7 @@ site_boxplots <- site_boxplots + facet_grid(site~ .)
 site_boxplots <- site_boxplots + stat_summary(fun.y= mean, geom = "point", color = "red", size = 2.5)
 site_boxplots <- site_boxplots + theme_tufte()
 site_boxplots
-ggsave("figs/site_boxplots.pdf", site_boxplots, width = 20, height = 14)
+ggsave("figs/site_boxplots.eps", site_boxplots, width = 14, height = 20)
 
 # Calculate the mean and standard devation of probability differences between existing conditions and each scenario
 diffstats <- ddply(.data = combined_all_sites, .variables = c("scenario", "site"), summarize, meandiff = mean(prob_diff, na.rm=TRUE), sddiff = sd(prob_diff, na.rm=TRUE), mediandiff = median(prob_diff, na.rm=TRUE), twentyfive_percent = quantile(prob_diff, 0.25, na.rm=TRUE), seventyfive_percent = quantile(prob_diff, 0.75, na.rm=TRUE))
@@ -90,7 +90,7 @@ site_diff_bars <- site_diff_bars + geom_errorbar(aes(ymin = twentyfive_percent, 
 site_diff_bars <- site_diff_bars + scale_fill_grey() + theme_tufte()
 site_diff_bars <- site_diff_bars + ylab("Median Relative Decrease in Posterior Probability of Recruitment") + xlab("")
 site_diff_bars
-ggsave("figs/site_diff_bars.pdf", site_diff_bars, width = 16, height = 12)
+ggsave("figs/site_diff_bars.eps", site_diff_bars, width = 16, height = 12)
 
 # Calculate the average number of events during each time state
 eventstats <- ddply(.data = combined_all_sites, .variables = c("scenario", "site"), summarize, mean_apr_may = mean(apr_may), mean_jun_jul = mean(jun_jul), mean_aug_sep = mean(aug_sep))
@@ -128,7 +128,7 @@ prob_histogram <- prob_histogram + geom_histogram(stat = "bin", binwidth = 0.005
 prob_histogram <- prob_histogram + facet_grid(site ~ scenario)
 prob_histogram <- prob_histogram + theme_tufte()
 prob_histogram
-ggsave("figs/prob_histogram.pdf", prob_histogram, width = 18, height = 12)
+ggsave("figs/prob_histogram.eps", prob_histogram, width = 14, height = 20)
 
 
 only_positive <- subset(combined_all_sites, combined_all_sites$prob_diff > 0)
