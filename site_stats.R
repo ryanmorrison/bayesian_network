@@ -95,6 +95,10 @@ ggsave("figs/site_diff_bars.eps", site_diff_bars, width = 16, height = 12)
 # Calculate the average number of events during each time state
 eventstats <- ddply(.data = combined_all_sites, .variables = c("scenario", "site"), summarize, mean_apr_may = mean(apr_may), mean_jun_jul = mean(jun_jul), mean_aug_sep = mean(aug_sep))
 
+eventstats_scenario <- ddply(.data = combined_all_sites, .variables = c("scenario"), summarize, mean_apr_may = mean(apr_may), mean_jun_jul = mean(jun_jul), mean_aug_sep = mean(aug_sep))
+
+eventstats_percent <- data.frame(apr_may = (eventstats_scenario$mean_apr_may[1]-eventstats_scenario$mean_apr_may)/eventstats_scenario$mean_apr_may[1]*100, jun_jul = (eventstats_scenario$mean_jun_jul[1]-eventstats_scenario$mean_jun_jul)/eventstats_scenario$mean_jun_jul[1]*100, aug_sep = (eventstats_scenario$mean_aug_sep[1]-eventstats_scenario$mean_aug_sep)/eventstats_scenario$mean_aug_sep[1]*100)
+
 # Calculate difference in events each season for each scenario
 eventdiffs <- as.data.frame(matrix(nrow = 5, ncol = 3))
 for (i in 1:5){
