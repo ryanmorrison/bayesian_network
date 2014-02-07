@@ -128,11 +128,11 @@ ggsave("figs/site_boxplots.pdf", site_boxplots, width = 20, height = 14)
 
 removed_existing <- subset(combined_all_sites, combined_all_sites$scenario != "existing")
 prob_histogram <- ggplot(data = removed_existing, aes(x = prob_diff))
-prob_histogram <- prob_histogram + geom_histogram(stat = "bin", binwidth = 0.005)
+prob_histogram <- prob_histogram + geom_histogram(stat = "bin", binwidth = 0.01)
 prob_histogram <- prob_histogram + facet_grid(site ~ scenario)
 prob_histogram <- prob_histogram + theme_tufte()
 prob_histogram
-ggsave("figs/prob_histogram.eps", prob_histogram, width = 14, height = 20)
+ggsave("figs/prob_histogram.eps", prob_histogram, width = 20, height = 12)
 
 
 only_positive <- subset(combined_all_sites, combined_all_sites$prob_diff > 0)
