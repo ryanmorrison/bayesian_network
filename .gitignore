@@ -4,5 +4,7 @@
 /output
 /test
 /figs
+.sublime-project
+.sublime-workspace
 
 .DS_Store
