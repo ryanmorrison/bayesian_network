@@ -3,9 +3,6 @@
 .Rapp.history
 .Rproj
 .RData
-/output
-/test
-/figs
 .sublime-project
 .sublime-workspace
 site/

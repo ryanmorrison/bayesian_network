@@ -1,9 +1,0 @@
-Steps for processing R-code of riparian recruitment probabilities.
-
-1. Source functions.R.
-
-2. Run hydrology_process_site5.R (or equivalent file for another site) to calculate hydrology condition probabilities.
-
-3. Run hydrology_network_site5.R (or equivalent file for another site) to construct Bayesian network.
-
-4. Run grid_network_states.R to populate evidence from grids and process evidence in the network.
