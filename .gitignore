@@ -8,5 +8,6 @@
 /figs
 .sublime-project
 .sublime-workspace
+site/
 
 .DS_Store
