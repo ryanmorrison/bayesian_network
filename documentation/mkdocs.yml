@@ -1,0 +1,5 @@
+site_name: Spatial Bayesian Network Modeling of Riparian Recruitment
+pages:
+- [index.md, Home]
+- [about.md, About]
+theme: readthedocs
